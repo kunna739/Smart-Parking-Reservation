@@ -1,0 +1,31 @@
+# C11 build artifacts
+*.exe
+*.o
+*.obj
+*.dll
+*.so
+*.dylib
+*.a
+
+# SQLite Databases & logs
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Node / Next.js
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/build/
+.npm/
+
+# IDE & OS
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
+*.log
+
+# Internal context
+Context/
