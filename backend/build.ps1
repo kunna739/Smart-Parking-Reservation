@@ -7,6 +7,15 @@ param(
 $ErrorActionPreference = "Stop"
 
 $CC = "gcc"
+if (-not (Get-Command "gcc" -ErrorAction SilentlyContinue)) {
+    if (Test-Path "C:\msys64\mingw64\bin\gcc.exe") {
+        $env:PATH = "C:\msys64\mingw64\bin;" + $env:PATH
+        $CC = "C:\msys64\mingw64\bin\gcc.exe"
+    } elseif (Test-Path "C:\MinGW\bin\gcc.exe") {
+        $env:PATH = "C:\MinGW\bin;" + $env:PATH
+        $CC = "C:\MinGW\bin\gcc.exe"
+    }
+}
 $CFLAGS = @("-std=c11", "-Wall", "-Wextra", "-pedantic", "-O2", "-Iinclude", "-Ilib")
 $LDFLAGS = @("-lsqlite3", "-lws2_32")
 
