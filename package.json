@@ -4,7 +4,7 @@
   "private": true,
   "description": "Smart Parking Reservation and Management System",
   "scripts": {
-    "dev": "npm --prefix frontend run dev",
+    "dev": "node scripts/dev.js",
     "backend": "powershell -Command \".\\backend\\server.exe 8080\"",
     "start:all": "cmd /c start.bat",
     "build": "npm --prefix frontend run build",
