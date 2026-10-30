@@ -61,6 +61,18 @@ async function start() {
   // 2. Launch Next.js Frontend Dev Server
   console.log('\x1b[32m[Frontend]\x1b[0m Starting Next.js Dev Server on http://localhost:3000 ...');
   const nextBin = path.join(rootDir, 'frontend', 'node_modules', 'next', 'dist', 'bin', 'next');
+
+  // If node_modules does not exist (fresh clone), automatically install dependencies
+  if (!fs.existsSync(nextBin)) {
+    console.log('\x1b[33m[Frontend]\x1b[0m node_modules not found. Automatically running npm install...');
+    const { execSync } = require('child_process');
+    const npmCmd = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+    execSync(`${npmCmd} install`, {
+      cwd: path.join(rootDir, 'frontend'),
+      stdio: 'inherit',
+    });
+  }
+
   frontendProc = spawn(process.execPath, [nextBin, 'dev', '-p', '3000'], {
     cwd: path.join(rootDir, 'frontend'),
     stdio: 'inherit',
