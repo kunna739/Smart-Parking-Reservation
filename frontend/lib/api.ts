@@ -25,12 +25,23 @@ async function fetchApi<T>(path: string, options?: RequestInit): Promise<T> {
       cache: 'no-store',
     });
 
+    if (!res.ok) {
+      let errMsg = `Backend server error (HTTP ${res.status}).`;
+      try {
+        const errJson = await res.json();
+        if (errJson && errJson.error) errMsg = errJson.error;
+      } catch {
+        errMsg = `Backend C11 server is not responding on port 8080 (HTTP ${res.status}). Please run 'npm run dev' to start both backend & frontend.`;
+      }
+      throw new Error(errMsg);
+    }
+
     const text = await res.text();
     let json: ApiResponse<T>;
     try {
       json = JSON.parse(text);
     } catch {
-      throw new Error(`Backend server is not reachable on port 8080 (HTTP ${res.status}). Please ensure backend/server.exe is running.`);
+      throw new Error(`Invalid response received from backend. Please ensure backend/server.exe is running on port 8080.`);
     }
 
     if (!json.success) {

@@ -51,11 +51,21 @@ async function start() {
     backendProc = spawn(serverExe, ['8080'], {
       cwd: rootDir,
       stdio: 'inherit',
+      shell: false,
     });
 
     backendProc.on('error', (err) => {
       console.error('\x1b[31m[Backend Error]\x1b[0m Failed to start server.exe:', err.message);
     });
+
+    // Wait until backend server is actively listening on port 8080
+    for (let i = 0; i < 25; i++) {
+      await new Promise((r) => setTimeout(r, 200));
+      if (await isPortListening(8080)) {
+        console.log('\x1b[32m[Backend]\x1b[0m C11 REST server is ready and accepting requests.');
+        break;
+      }
+    }
   }
 
   // 2. Launch Next.js Frontend Dev Server
@@ -67,19 +77,29 @@ async function start() {
   const npmCmd = process.platform === 'win32' ? 'npm.cmd' : 'npm';
   if (!fs.existsSync(frontendModules)) {
     console.log('\x1b[33m[Frontend]\x1b[0m node_modules not found. Automatically running npm install in frontend folder...');
-    const { execSync } = require('child_process');
-    execSync(`${npmCmd} install`, {
+    const { spawnSync } = require('child_process');
+    spawnSync(npmCmd, ['install'], {
+      cwd: frontendDir,
+      stdio: 'inherit',
+      shell: process.platform === 'win32',
+    });
+  }
+
+  // Directly spawn Node with Next.js CLI to avoid Windows cmd ampersand / space splitting
+  const nextCli = path.join(frontendDir, 'node_modules', 'next', 'dist', 'bin', 'next');
+  if (fs.existsSync(nextCli)) {
+    frontendProc = spawn(process.execPath, [nextCli, 'dev', '-p', '3000'], {
+      cwd: frontendDir,
+      stdio: 'inherit',
+      shell: false,
+    });
+  } else {
+    frontendProc = spawn(npmCmd, ['run', 'dev:frontend'], {
       cwd: frontendDir,
       stdio: 'inherit',
       shell: true,
     });
   }
-
-  frontendProc = spawn(npmCmd, ['run', 'dev:frontend'], {
-    cwd: frontendDir,
-    stdio: 'inherit',
-    shell: true,
-  });
 
   frontendProc.on('error', (err) => {
     console.error('\x1b[31m[Frontend Error]\x1b[0m Failed to start Next.js:', err.message);
