@@ -17,9 +17,16 @@ start "Smart Parking C11 Backend" /min "%~dp0backend\server.exe" 8080
 REM Wait 2 seconds for backend initialization
 timeout /t 2 /nobreak >nul
 
-REM 3. Start Next.js Frontend
+REM 3. Check if frontend/node_modules exists, if not install dependencies
+if not exist "%~dp0frontend\node_modules" (
+    echo [INFO] Installing frontend dependencies (npm install)...
+    cd /d "%~dp0frontend"
+    call npm.cmd install
+)
+
+REM 4. Start Next.js Frontend
 echo [INFO] Starting Next.js Frontend on http://localhost:3000...
 echo [INFO] Open your browser at http://localhost:3000
 echo ==========================================================
 cd /d "%~dp0frontend"
-npm.cmd run dev
+npm.cmd run dev:frontend

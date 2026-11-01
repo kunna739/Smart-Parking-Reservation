@@ -5,6 +5,8 @@
   "description": "Smart Parking Reservation and Management System",
   "scripts": {
     "dev": "node scripts/dev.js",
+    "postinstall": "npm --prefix frontend install",
+    "install:all": "npm --prefix frontend install",
     "backend": "powershell -Command \".\\backend\\server.exe 8080\"",
     "start:all": "cmd /c start.bat",
     "build": "npm --prefix frontend run build",
