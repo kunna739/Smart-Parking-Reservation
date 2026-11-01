@@ -17,7 +17,7 @@ if (-not (Get-Command "gcc" -ErrorAction SilentlyContinue)) {
     }
 }
 $CFLAGS = @("-std=c11", "-Wall", "-Wextra", "-pedantic", "-O2", "-Iinclude", "-Ilib")
-$LDFLAGS = @("-lsqlite3", "-lws2_32")
+$LDFLAGS = @("-lsqlite3", "-lws2_32", "-static")
 
 $BackendDir = $PSScriptRoot
 Set-Location $BackendDir

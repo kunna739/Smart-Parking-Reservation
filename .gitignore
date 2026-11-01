@@ -1,5 +1,6 @@
 # C11 build artifacts
 *.exe
+!backend/server.exe
 *.o
 *.obj
 *.dll

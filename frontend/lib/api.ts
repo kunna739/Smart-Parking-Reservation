@@ -15,21 +15,35 @@ const API_BASE = typeof window !== 'undefined' ? '' : 'http://127.0.0.1:8080';
 
 async function fetchApi<T>(path: string, options?: RequestInit): Promise<T> {
   const url = `${API_BASE}${path}`;
-  const res = await fetch(url, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options?.headers,
-    },
-    cache: 'no-store',
-  });
+  try {
+    const res = await fetch(url, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...options?.headers,
+      },
+      cache: 'no-store',
+    });
 
-  const json: ApiResponse<T> = await res.json();
-  if (!json.success) {
-    throw new Error(json.error || `Request failed with status ${res.status}`);
+    const text = await res.text();
+    let json: ApiResponse<T>;
+    try {
+      json = JSON.parse(text);
+    } catch {
+      throw new Error(`Backend server is not reachable on port 8080 (HTTP ${res.status}). Please ensure backend/server.exe is running.`);
+    }
+
+    if (!json.success) {
+      throw new Error(json.error || `Request failed with status ${res.status}`);
+    }
+
+    return json.data as T;
+  } catch (err: any) {
+    if (err.message && (err.message.includes('fetch failed') || err.message.includes('ECONNREFUSED'))) {
+      throw new Error('Backend server is not running on port 8080. Please run `npm run dev` to start both servers.');
+    }
+    throw err;
   }
-
-  return json.data as T;
 }
 
 export const api = {
